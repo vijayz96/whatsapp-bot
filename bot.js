@@ -158,14 +158,31 @@ ${chalk.blue.italic.bgBlack("ℹ️ Connecting to WhatsApp... Please wait.")}`)
   await groupUnmuteSchuler(conn)
   await customMessageScheduler(conn)
 
-  conn.on("chat-update", (m) => {
-    if (!m.hasNewMessage) return
-    if (!m.messages && !m.count) return
-    const { messages } = m
-    const all = messages.all()
-    handleMessages(all[0], conn)
-  })
+  // AUTO REDIRECT — Trail Group → XESOID Women's Trends
+const SOURCE_JID = '120363428389082831@g.us'
+const TARGET_JID = '120363424960811886@g.us'
 
+conn.on("chat-update", async (m) => {
+    if (!m.hasNewMessage) return
+    if (!m.messages) return
+    const msg = m.messages.all()[0]
+    if (!msg) return
+    if (msg.key.remoteJid !== SOURCE_JID) return
+    if (msg.key.fromMe) return
+
+    const content = msg.message
+    if (!content) return
+
+    const isMedia = content.imageMessage || 
+                    content.videoMessage || 
+                    content.documentMessage
+
+    if (!isMedia) return
+
+    console.log('[AutoRedirect] Image detected! Forwarding...')
+    await conn.forwardMessage(TARGET_JID, msg)
+    console.log('[AutoRedirect] Done!')
+})
   try {
     await conn.connect()
   } catch (e) {
