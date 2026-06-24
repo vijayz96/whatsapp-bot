@@ -169,6 +169,9 @@ conn.on("chat-update", async (m) => {
         const msg = m.messages.all()[0]
         if (!msg) return
 
+console.log("Message received")
+console.log(JSON.stringify(content))
+
         if (msg.key.remoteJid !== SOURCE_JID) return
         if (msg.key.fromMe) return
 
